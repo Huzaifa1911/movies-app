@@ -11,9 +11,11 @@ extension UIColor {
     struct appTheme {
         static let background = UIColor(named: "background")!
         static let oceanBlue = UIColor(named: "oceanBlue")!
+        static let lightBackground = UIColor(red: 0.23, green: 0.25, blue: 0.28, alpha: 1)
         static let darkGray = UIColor(red: 0.4, green: 0.41, blue: 0.43, alpha: 1)
         static let secondaryText = UIColor(red: 0.93, green: 0.93, blue: 0.92, alpha: 1)
         static let text = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+        static let orange = UIColor(red: 1, green: 0.53, blue: 0, alpha: 1)
     }
     
     convenience init(hex: String) {

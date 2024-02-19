@@ -7,19 +7,37 @@
 
 import UIKit
 
-class SearchCoordinator: Coordinator {
+class SearchCoordinator: NSObject, Coordinator, UINavigationControllerDelegate {
     var childCoordinators = [Coordinator]()
-    let rootViewController: UINavigationController
-    
-    init() {
-        rootViewController = UINavigationController()
-        rootViewController.navigationBar.setFont(font: .semiBold, size: 16, color: .appTheme.secondaryText)
-        rootViewController.tabBarItem = .init(title: "Search", image: .icons.magnifyingGlass?.setSize(of: 14), tag: 0)
-        rootViewController.tabBarItem.setFont(font: .semiBold, size: 10, color: .appTheme.text, selectedColor: .appTheme.oceanBlue)
+    var navigationController: UINavigationController
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
     
     func start() {
+        self.navigationController.delegate = self
         let searchVC = SearchViewController()
-        rootViewController.setViewControllers([searchVC], animated: false)
+        searchVC.delegate = self
+        navigationController.viewControllers = [searchVC]
+    }
+    
+    func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
+        guard let fromViewController = navigationController.transitionCoordinator?.viewController(forKey: .from) else { return }
+        
+        if navigationController.viewControllers.contains(fromViewController) { return }
+        
+        if let movieDetailsViewController = fromViewController as? MovieDetailsViewController {
+            childDidFinish(movieDetailsViewController.coordinator)
+        }
+    }
+}
+
+
+// MARK: SearchViewControllerDelegate Configuration
+extension SearchCoordinator: SearchViewControllerDelegate {
+    func didTappedOnMovie(movieId: Int) {
+        let movieDetailsCoordinator = MovieDetailsCoordinator(navigationController: navigationController, movieId: movieId)
+        childCoordinators.append(movieDetailsCoordinator)
+        movieDetailsCoordinator.start()
     }
 }

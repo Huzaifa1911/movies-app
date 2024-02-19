@@ -7,19 +7,45 @@
 
 import UIKit
 
-class WatchlistCoordinator: Coordinator {
+class WatchlistCoordinator: NSObject, Coordinator, UINavigationControllerDelegate {
     var childCoordinators = [Coordinator]()
-    let rootViewController: UINavigationController
+    var navigationController: UINavigationController
+    let watchlistViewModel: WatchlistViewModel
     
-    init() {
-        rootViewController = UINavigationController()
-        rootViewController.navigationBar.setFont(font: .semiBold, size: 16, color: .appTheme.secondaryText)
-        rootViewController.tabBarItem = .init(title: "Watch list", image: .icons.bookmark?.setSize(of: 14), tag: 2)
-        rootViewController.tabBarItem.setFont(font: .semiBold, size: 10, color: .appTheme.text, selectedColor: .appTheme.oceanBlue)
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
+        self.watchlistViewModel = .init()
+    }
+    
+    @objc private func watchlistUpdated() {
+        watchlistViewModel.fetchWatchlistMovies()
     }
     
     func start() {
-        let watchlistVC = WatchlistViewController()
-        rootViewController.setViewControllers([watchlistVC], animated: false)
+        // Add Observer to listen for notification generated when movie added to watchlist
+        NotificationCenter.default.addObserver(self, selector: #selector(watchlistUpdated), name: .watchlistUpdated, object: nil)
+        self.navigationController.delegate = self
+        let watchlistVC = WatchlistViewController(viewModel: watchlistViewModel)
+        watchlistVC.delegate = self
+        navigationController.viewControllers = [watchlistVC]
+    }
+    
+    func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
+        guard let fromViewController = navigationController.transitionCoordinator?.viewController(forKey: .from) else { return }
+        
+        if navigationController.viewControllers.contains(fromViewController) { return }
+        
+        if let movieDetailsViewController = fromViewController as? MovieDetailsViewController {
+            childDidFinish(movieDetailsViewController.coordinator)
+        }
+    }
+}
+
+// MARK: - WatchlistViewControllerDelegate Configuration
+extension WatchlistCoordinator: WatchlistViewControllerDelegate {
+    func didTappedOnMovie(movieId: Int) {
+        let movieDetailsCoordinator = MovieDetailsCoordinator(navigationController: navigationController, movieId: movieId)
+        childCoordinators.append(movieDetailsCoordinator)
+        movieDetailsCoordinator.start()
     }
 }

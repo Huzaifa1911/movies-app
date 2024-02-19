@@ -12,10 +12,22 @@ extension UIImage {
         static let house = UIImage(systemName: "house")
         static let magnifyingGlass = UIImage(systemName: "magnifyingglass")
         static let bookmark = UIImage(systemName: "bookmark")
+        static let bookmarkFill = UIImage(systemName: "bookmark.fill")
+        static let photo = UIImage(systemName: "photo")
+        static let calendar = UIImage(systemName: "calendar")
+        static let clock = UIImage(systemName: "clock")
+        static let ticket = UIImage(systemName: "ticket")
+        static let chevronLeft = UIImage(systemName: "chevron.left")
+        static let star = UIImage(systemName: "star")
+        static let xmark = UIImage(systemName: "xmark")
+        static let noResult = UIImage(named: "noResult")
+        static let magicBox = UIImage(named: "magicBox")
+        static let avatar = UIImage(named: "avatar")
+       
     }
     
     // only used for SF symbols
-    func setSize(of pointSize: CGFloat) -> UIImage? {
+    func size(of pointSize: CGFloat) -> UIImage? {
         self.applyingSymbolConfiguration(.init(pointSize: pointSize))
     }
 }
